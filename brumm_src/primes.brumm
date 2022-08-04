@@ -1,0 +1,56 @@
+
+# start
+    ldi i 0
+    ldi a 2
+    inc a
+    store a
+
+def init_loop
+    inc i
+    ldi tmp 64
+    cmp i tmp
+    if not zero goto init_loop
+    store a
+    ldi tmp 2
+    add= a tmp
+    -
+
+def init_done
+    ldi i 1
+    -
+    -
+def main_loop
+    load a
+    if zero goto main_loop
+    inc i
+    mov h i
+    mov b a
+    -
+# output when not 0
+    ldi i 123
+    -
+    store a
+    add i h a
+
+
+def inner_loop
+    ldi tmp 63
+    cmp i tmp
+    if not cout goto inner_loop
+    store 0
+    add= i a
+    -
+    -
+def inner_done
+# restore i
+    mov i h
+    ldi tmp 63
+    cmp i tmp
+    if zero goto main_done
+    inc i
+    -
+    -
+    -
+
+def main_done
+halt
