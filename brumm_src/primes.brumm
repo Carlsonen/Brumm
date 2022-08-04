@@ -1,56 +1,57 @@
 
 # start
+    ldi g 63
     ldi i 0
     ldi a 2
     inc a
     store a
 
-def init_loop
+def loop
     inc i
-    ldi tmp 64
-    cmp i tmp
-    if not zero goto init_loop
+    cmp i g
+    if not zero goto loop
     store a
-    ldi tmp 2
-    add= a tmp
+    inc a
+    inc a
     -
 
-def init_done
-    ldi i 1
-    -
-    -
+ldi a 2
+ldi i 123
+ldi i 1
+store a
+-
 def main_loop
     load a
     if zero goto main_loop
+    mov g i
     inc i
-    mov h i
-    mov b a
     -
-# output when not 0
+    -
+def not 0
     ldi i 123
-    -
+    mov i g
     store a
-    add i h a
 
-
-def inner_loop
-    ldi tmp 63
-    cmp i tmp
-    if not cout goto inner_loop
-    store 0
+def set_0
     add= i a
-    -
-    -
-def inner_done
-# restore i
-    mov i h
     ldi tmp 63
     cmp i tmp
-    if zero goto main_done
+    if greater goto next_num
+    -
+    -
+    -
+    -
+    goto set_0
+    store 0
+    -
+def next_num
+    mov i g
     inc i
+    ldi tmp 63
+    cmp i tmp
+    if not greater goto main_loop
     -
     -
     -
-
-def main_done
+    -
 halt

@@ -1,0 +1,16 @@
+ldi i 123
+
+ldi a 0
+ldi b 0
+ldi c 1
+
+def loop
+    store a
+    add a b c
+    if not cout goto loop
+    mov c b
+    mov b a
+    -
+    -
+def end
+halt

@@ -9,6 +9,7 @@ pub struct BrummCpuEmulator {
 
     jmp_info: [Option<u8>; 5],
     reg4io: [u8; 11],
+    reg4io_buffer: [u8; 11],
     pointer: [u8; 4],
     fl_cout: bool,
     fl_odd: bool,
@@ -27,6 +28,7 @@ impl BrummCpuEmulator {
             call_stack: vec![],
             jmp_info: [None; 5],
             reg4io: [0; 11],
+            reg4io_buffer: [0; 11],
             pointer: [0; 4],
             fl_cout: false,
             fl_odd: false,
@@ -43,7 +45,8 @@ impl BrummCpuEmulator {
         self.jmp_info[0] = None;
 
         self.registers[0] = 0;
-        self.reg4io = self.registers.clone();
+        self.reg4io = self.reg4io_buffer.clone();
+        self.reg4io_buffer = self.registers.clone();
 
         self.pointer[3] = self.pointer[2];
         self.pointer[2] = self.pointer[1];
@@ -153,7 +156,7 @@ impl BrummCpuEmulator {
             }
             10 => {
                 // load
-                let p = self.pointer[3] as usize;
+                let p = self.pointer[2] as usize;
                 let p_stack = self.pointer[1] as usize;
                 let c: u16 = match p {
                     0..=63 => self.ram[p] as u16,
@@ -166,7 +169,6 @@ impl BrummCpuEmulator {
                     },
                     _ => 0,
                 };
-
                 self.update_flags(c);
 
                 self.registers[instr[1] as usize] = c as u8;
@@ -174,7 +176,7 @@ impl BrummCpuEmulator {
             11 => {
                 // store
                 let val = self.reg4io[instr[2] as usize];
-                let p = self.pointer[2] as usize;
+                let p = self.pointer[1] as usize;
                 match p {
                     127 => {
                         self.data_stack.push(val);
@@ -211,7 +213,7 @@ impl BrummCpuEmulator {
                 // call
                 let num = instr[2] + ((instr[3]) << 4);
                 self.jmp_info[2] = Some(num);
-                if instr[1] >= 8 {
+                if instr[1] < 8 {
                     self.call_stack.push(self.pc + 3);
                 }
                 self.update_flags(0);
@@ -247,7 +249,7 @@ impl BrummCpuEmulator {
     fn update_flags(&mut self, num: u16) {
         self.fl_cout = num > 255;
         self.fl_odd = num % 2 == 1;
-        self.fl_zero = num == 0;
+        self.fl_zero = (num % 256) == 0;
     }
     pub fn get_regfile(&self) -> [u8; 11] {
         self.registers.clone()
