@@ -125,7 +125,7 @@ fn assmeble_brumm(filename: &str) -> Vec<[u8; 4]> {
             "and=" => [5, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
             "xor=" => [6, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
             "xnor=" => [7, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
-            "rshift=" => [8, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
+            "rshift=" => [8, regs[tokens[1]], regs[tokens[1]], 0],
 
             "mov" => [0, regs[tokens[1]], regs[tokens[2]], 0],
             "cmp" => [1, 0, regs[tokens[1]], regs[tokens[2]]],

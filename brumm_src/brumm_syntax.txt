@@ -1,0 +1,175 @@
+Every line should be a keyword followed by arguments accepted by the keyword.
+There are 9 registers (a-i), passing '0' as a register argument will act as 0-register.
+Register 9 (i) is the pointer for memory, which is the only way to access memory.
+Its all 8 bits, numbers, program counter etc..
+Comments are defined with "#" followed by a space, becuase "#" is its own keyword.
+
+the instruction set:
+    add     <reg1> <reg2> <reg3>            : reg1 = reg2 + reg3
+    sub     <reg1> <reg2> <reg3>            : reg1 = reg2 - reg3
+    addci   <reg1> <reg2> <reg3>            : reg1 = reg2 + reg3 + 1
+    addco   <reg1> <reg2> <reg3>            : reg1 = reg2 + reg3 + carry_flag
+    or      <reg1> <reg2> <reg3>            : reg1 = reg2 or reg3
+    and     <reg1> <reg2> <reg3>            : reg1 = reg2 and reg3
+    xor     <reg1> <reg2> <reg3>            : reg1 = reg2 xor reg3
+    xnor    <reg1> <reg2> <reg3>            : reg1 = reg2 xnor reg3
+    rshift  <reg1> <reg2> <reg3>            : reg1 = (reg2 or reg3) >> 1
+    ldi     <reg> <number>                  : reg = immediate value
+    load    <reg>                           : reg = ram[i]
+    store   <reg>                           : ram[i] = reg
+    if      <condition> goto <label>        : you have to put goto before label
+    goto    <label>                         : PC = label
+    call    <label>                         : PC = label, pushes PC + 3 to call_stack
+    return                                  : PC = call_stack.pop()
+    halt                                    : stops clock
+
+Those are the only instructions the CPU can run, but the assembler allows for some extra
+instructions which are translated to these primitive ones.
+
+Extra shit you can write:
+    2op arithmetic:                         : reg1 = reg1 <operation> reg2
+        add= <reg1> <reg2>
+        sub= <reg1> <reg2>
+        addci= <reg1> <reg2>
+        addco= <reg1> <reg2>
+        or= <reg1> <reg2>
+        and= <reg1> <reg2>
+        xor= <reg1> <reg2>
+        xnor= <reg1> <reg2>
+    1op arithmetic:
+        rshift= <reg>                       : reg1 = reg1 >> 1
+        inc <reg>                           : reg = reg + 1
+    extra shit:
+        mov <reg1> <reg2>                   : reg1 = reg2
+        cmp <reg1> <reg2>                   : 0 = reg1 - reg2
+        jmp <label>                         : alias for "goto"
+        -                                   : noop
+        noop                                : noop
+        def <name>                          : creates a label with the name
+
+Branch conditions:
+    zero                                    : branch if 0
+    odd                                     : branch if odd
+    cout                                    : branch if carry out
+    not zero                                : branch if not 0
+    not odd                                 : branch if not odd
+    not cout                                : branch if not carry out
+    greater                                 : alias to cout, works for unsigned comparison using "cmp" or "sub"
+
+
+
+Delay slots and hazards:
+    if <condition> goto <label> only check for flags from the prior instruction.
+        valid:
+            add= a b
+            cmp a c
+            if not greater goto label
+        invalid:
+            add= a b
+            cmp a c
+            store d
+            if not greater goto label
+
+    goto, call, and return has 2 delay slots.
+        Example:
+            add a b c
+            goto label
+            xor= e f        (will be executed)
+            load a          (will be executed)
+        To avoid execution, insert noop:
+            add a b c
+            goto label
+            -               
+            -               
+            xor= e f        (will not be executed)
+            load a          (will not be executed)
+
+    if has 4 delay slots:
+        cmp a b
+        if not odd goto label
+        -                       (will always be executed)       
+        -                       (will always be executed) 
+        -                       (will always be executed) 
+        -                       (will always be executed)
+
+    pointer needs to be updated 2 cycles before store:
+        invalid:
+            ldi i 123
+            store a         (will store a to whatever i was previously)
+        valid:
+            ldi i 123
+            -
+            store a
+    register needs to be updated 2 cycles before store:
+        invalid:
+            ldi i 123
+            ldi a 5
+            store a         (will store whatever a was previously)
+        valid:
+            ldi i 123
+            ldi a 5
+            -
+            store a
+        pro tip:
+            # this will store a to 123, and b to 124
+            ldi i 123
+            ldi i 124
+            store a
+            store b
+    pointer needs to be updated 3 cycles before load:
+        invalid:
+            ldi i 52
+            -
+            load a
+        valid:
+            ldi i 52
+            -
+            -
+            load a
+        pro tip:
+            # pipelined reads
+            ldi i 52
+            inc i
+            inc i
+            load a      (52)
+            load b      (53)
+            load c      (54)
+        
+memory:
+    address 0-63 is ram
+    address 123-126 is ports        (can currenty not read from them)
+    address 127 is a data stack     (infinite size), btw the call stack is also infinite
+
+    weird ass shit:
+        invalid:
+            ldi i 52
+            -
+            load a
+        valid:                      (data stack only needs 1 extra cycle to read)
+            ldi i 127
+            -
+            load a
+        wtf:
+            ldi i 52
+            ldi i 127
+            -
+            load a                  (a = ram[52] or stack.pop() becuse they share the bus)
+
+Special registers:
+    0-register:
+        saving to 0 reg only updates flags:
+            add 0 a b     (will not save result, but can be used to update flags)
+        reading from 0 register always give 0:
+            xnor= a 0     (a = a xnor 0, flips bits of a) (maybe i should add a "not alias")
+    tmp-register:         (only valid for the next clock cycle, used for tmp shit without using a register)
+        ldi tmp 5
+        add= a tmp        (addition with immediate)
+
+        ldi tmp 8
+        cmp a tmp         (compare with immediate)
+
+        add tmp a a       (tmp = 2 * a)
+        addci= a tmp      (a = a + tmp + 1)
+        # a is now 3x+1 in 2 cycles, using no other register
+
+
