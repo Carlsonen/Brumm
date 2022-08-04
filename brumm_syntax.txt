@@ -2,7 +2,16 @@ Every line should be a keyword followed by arguments accepted by the keyword.
 There are 9 registers (a-i), passing '0' as a register argument will act as 0-register.
 Register 9 (i) is the pointer for memory, which is the only way to access memory.
 Its all 8 bits, numbers, program counter etc..
-Comments are defined with "#" followed by a space, becuase "#" is its own keyword.
+
+Comments are defined with "#" followed by a space, becuase "#" is its own keyword:
+    # this is a comment
+    #dont do this
+You can rename registers using "use" keyword:
+    use pos_x                   (maps "pos_x" to first available (a))
+    use pos_y                   (maps "pos_y" to first available (b))
+    use counter another_var     (you can put multiple in one line)
+
+    > you may only rename the first 8 registers (a-h), i can not be rename to make it clear its the pointer
 
 the instruction set:
     add     <reg1> <reg2> <reg3>            : reg1 = reg2 + reg3
@@ -55,8 +64,43 @@ Branch conditions:
     not odd                                 : branch if not odd
     not cout                                : branch if not carry out
     greater                                 : alias to cout, works for unsigned comparison using "cmp" or "sub"
+        
+Memory:
+    address 0-63 is ram
+    address 123-126 is ports        (can currenty not read from them) (prints to terminal on store)
+    address 127 is a data stack     (infinite size), btw the call stack is also infinite
 
+    weird ass shit:
+        invalid:
+            ldi i 52
+            -
+            load a
+        valid:                      (data stack only needs 1 extra cycle to read)
+            ldi i 127
+            -
+            load a
+        wtf:
+            ldi i 52
+            ldi i 127
+            -
+            load a                  (a = ram[52] or stack.pop() becuse they share the bus)
 
+Special registers:
+    0-register:
+        saving to 0 reg only updates flags:
+            add 0 a b     (will not save result, but can be used to update flags)
+        reading from 0 register always give 0:
+            xnor= a 0     (a = a xnor 0, flips bits of a) (maybe i should add a "not alias")
+    tmp-register:         (only valid for the next clock cycle, used for tmp shit without using a register)
+        ldi tmp 5
+        add= a tmp        (addition with immediate)
+
+        ldi tmp 8
+        cmp a tmp         (compare with immediate)
+
+        add tmp a a       (tmp = 2 * a)
+        addci= a tmp      (a = a + tmp + 1)
+        # a is now 3x+1 in 2 cycles, using no other register
 
 Delay slots and hazards:
     if <condition> goto <label> only check for flags from the prior instruction.
@@ -134,42 +178,3 @@ Delay slots and hazards:
             load a      (52)
             load b      (53)
             load c      (54)
-        
-memory:
-    address 0-63 is ram
-    address 123-126 is ports        (can currenty not read from them)
-    address 127 is a data stack     (infinite size), btw the call stack is also infinite
-
-    weird ass shit:
-        invalid:
-            ldi i 52
-            -
-            load a
-        valid:                      (data stack only needs 1 extra cycle to read)
-            ldi i 127
-            -
-            load a
-        wtf:
-            ldi i 52
-            ldi i 127
-            -
-            load a                  (a = ram[52] or stack.pop() becuse they share the bus)
-
-Special registers:
-    0-register:
-        saving to 0 reg only updates flags:
-            add 0 a b     (will not save result, but can be used to update flags)
-        reading from 0 register always give 0:
-            xnor= a 0     (a = a xnor 0, flips bits of a) (maybe i should add a "not alias")
-    tmp-register:         (only valid for the next clock cycle, used for tmp shit without using a register)
-        ldi tmp 5
-        add= a tmp        (addition with immediate)
-
-        ldi tmp 8
-        cmp a tmp         (compare with immediate)
-
-        add tmp a a       (tmp = 2 * a)
-        addci= a tmp      (a = a + tmp + 1)
-        # a is now 3x+1 in 2 cycles, using no other register
-
-

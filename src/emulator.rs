@@ -1,7 +1,7 @@
-pub struct brumm_cpu_emulator {
+pub struct BrummCpuEmulator {
     code: Vec<[u8; 4]>,
 
-    PC: u8,
+    pc: u8,
     registers: [u8; 11],
     ram: [u8; 64],
     data_stack: Vec<u8>,
@@ -16,11 +16,11 @@ pub struct brumm_cpu_emulator {
     is_running: bool,
 }
 
-impl brumm_cpu_emulator {
+impl BrummCpuEmulator {
     pub fn new(code: Vec<[u8; 4]>) -> Self {
-        brumm_cpu_emulator {
+        BrummCpuEmulator {
             code: code,
-            PC: 0,
+            pc: 0,
             registers: [0; 11],
             ram: [0; 64],
             data_stack: vec![],
@@ -50,7 +50,7 @@ impl brumm_cpu_emulator {
         self.pointer[1] = self.pointer[0];
         self.pointer[0] = self.registers[9];
         // (2) - Make Shit
-        let instr = self.code[self.PC as usize];
+        let instr = self.code[self.pc as usize];
 
         match instr[0] {
             0 => {
@@ -212,7 +212,7 @@ impl brumm_cpu_emulator {
                 let num = instr[2] + ((instr[3]) << 4);
                 self.jmp_info[2] = Some(num);
                 if instr[1] >= 8 {
-                    self.call_stack.push(self.PC + 3);
+                    self.call_stack.push(self.pc + 3);
                 }
                 self.update_flags(0);
             }
@@ -233,9 +233,9 @@ impl brumm_cpu_emulator {
             _ => {}
         }
         // (3) - PC Shit
-        self.PC = match self.jmp_info[4] {
+        self.pc = match self.jmp_info[4] {
             Some(v) => v,
-            None => self.PC + 1,
+            None => self.pc + 1,
         }
     }
     fn get_registers(&mut self, instr: [u8; 4]) -> (u16, u16) {
