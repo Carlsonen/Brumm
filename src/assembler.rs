@@ -116,17 +116,17 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
             "and=" => [5, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
             "xor=" => [6, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
             "xnor=" => [7, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
-            "rshift=" | ">>=" => [8, regs[tokens[1]], regs[tokens[1]], 0],
+            "rshift=" | ">>=" => [8, regs[tokens[1]], 0, regs[tokens[1]]],
             "lshift=" | "<<=" => [0, regs[tokens[1]], regs[tokens[1]], regs[tokens[1]]],
 
-            "mov" => [0, regs[tokens[1]], regs[tokens[2]], 0],
+            "mov" => [0, regs[tokens[1]], 0, regs[tokens[2]]],
             "cmp" => [1, 0, regs[tokens[1]], regs[tokens[2]]],
             "goto" | "jmp" => {
                 let num: u8 = labels[tokens[1]];
                 [13, 8, num & 0xf, (num >> 4) & 0xf]
             }
-            "inc" => [2, regs[tokens[1]], regs[tokens[1]], 0],
-            "check" => [0, 0, regs[tokens[1]], 0],
+            "inc" => [2, regs[tokens[1]], 0, regs[tokens[1]]],
+            "check" => [0, 0, 0, regs[tokens[1]]],
             _ => {
                 println!("wtf is this:\n{:?}\n", tokens);
                 continue;
