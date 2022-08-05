@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fs;
 
-pub fn assmeble_brumm(filename: &str) -> Vec<[u8; 4]> {
+pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
     let filepath = format!("brumm_src/{}.brumm", filename);
     let contents = fs::read_to_string(filepath).expect("Something went wrong reading the file");
     let lines: Vec<&str> = contents.lines().collect();
@@ -116,7 +116,8 @@ pub fn assmeble_brumm(filename: &str) -> Vec<[u8; 4]> {
             "and=" => [5, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
             "xor=" => [6, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
             "xnor=" => [7, regs[tokens[1]], regs[tokens[1]], regs[tokens[2]]],
-            "rshift=" => [8, regs[tokens[1]], regs[tokens[1]], 0],
+            "rshift=" | ">>=" => [8, regs[tokens[1]], regs[tokens[1]], 0],
+            "lshift=" | "<<=" => [0, regs[tokens[1]], regs[tokens[1]], regs[tokens[1]]],
 
             "mov" => [0, regs[tokens[1]], regs[tokens[2]], 0],
             "cmp" => [1, 0, regs[tokens[1]], regs[tokens[2]]],
@@ -125,6 +126,7 @@ pub fn assmeble_brumm(filename: &str) -> Vec<[u8; 4]> {
                 [13, 8, num & 0xf, (num >> 4) & 0xf]
             }
             "inc" => [2, regs[tokens[1]], regs[tokens[1]], 0],
+            "check" => [0, 0, regs[tokens[1]], 0],
             _ => {
                 println!("wtf is this:\n{:?}\n", tokens);
                 continue;
@@ -132,11 +134,13 @@ pub fn assmeble_brumm(filename: &str) -> Vec<[u8; 4]> {
         };
         bytecode.push(bytes);
     }
-    for bytes in &bytecode {
-        println!("{:?}", bytes);
+    if debug_mode {
+        for bytes in &bytecode {
+            println!("{:?}", bytes);
+        }
+        println!("{:?}", regs);
+        println!("{:?}", labels);
     }
-    println!("{:?}", regs);
-    println!("{:?}", labels);
     bytecode
 }
 pub fn bytes_to_barrelcode(bytecode: &mut Vec<[u8; 4]>) -> (Vec<[u8; 8]>, Vec<[u8; 8]>) {

@@ -15,12 +15,13 @@ pub struct BrummCpuEmulator {
     fl_odd: bool,
     fl_zero: bool,
     is_running: bool,
+    IO_in: [u8; 4],
 }
 
 impl BrummCpuEmulator {
-    pub fn new(code: Vec<[u8; 4]>) -> Self {
+    pub fn new() -> Self {
         BrummCpuEmulator {
-            code: code,
+            code: vec![],
             pc: 0,
             registers: [0; 11],
             ram: [0; 64],
@@ -34,7 +35,11 @@ impl BrummCpuEmulator {
             fl_odd: false,
             fl_zero: false,
             is_running: false,
+            IO_in: [0; 4],
         }
+    }
+    pub fn set_code(&mut self, code: Vec<[u8; 4]>) {
+        self.code = code;
     }
     pub fn tick(&mut self) {
         // (1) - Update Pipeline
@@ -160,6 +165,7 @@ impl BrummCpuEmulator {
                 let p_stack = self.pointer[1] as usize;
                 let c: u16 = match p {
                     0..=63 => self.ram[p] as u16,
+                    123..=126 => self.IO_in[(p - 123) as usize] as u16,
                     _ => 0,
                 };
                 let c = c | match p_stack {
@@ -261,6 +267,12 @@ impl BrummCpuEmulator {
         self.is_running = true;
         while self.is_running {
             self.tick();
+        }
+    }
+    pub fn set_input(&mut self, port: u8, value: u8) {
+        match port {
+            123..=126 => self.IO_in[(port - 123) as usize] = value,
+            _ => {}
         }
     }
 }

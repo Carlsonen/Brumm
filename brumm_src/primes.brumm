@@ -1,5 +1,4 @@
-
-# start
+def start
     ldi g 63
     ldi i 0
     ldi a 2
@@ -54,4 +53,5 @@ def next_num
     -
     -
     -
-halt
+def end
+    halt
