@@ -1,16 +1,26 @@
 ldi i 123
-
-ldi a 0
-ldi b 0
+ldi b 255
 ldi c 1
 
+
+def main_loop
+    load a
 def loop
+    if not odd goto even
+    sub 0 a c
+    if zero goto stop
+    inc b
     store a
-    add a b c
-    if not cout goto loop
-    mov c b
-    mov b a
     -
     -
-def end
-halt
+    goto loop
+    add tmp a a
+    addci= a tmp
+def even
+    goto loop
+    -
+    rshift= a a
+def stop
+    -
+    store b
+    halt

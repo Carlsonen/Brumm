@@ -28,6 +28,7 @@ the instruction set:
     store   <reg>                           : ram[i] = reg
     if      <condition> goto <label>        : you have to put goto before label
     goto    <label>                         : PC = label
+        alt: jmp
     call    <label>                         : PC = label, pushes PC + 3 to call_stack
     return                                  : PC = call_stack.pop()
     halt                                    : stops clock
@@ -47,11 +48,14 @@ Extra shit you can write:
         xnor= <reg1> <reg2>
     1op arithmetic:
         rshift= <reg>                       : reg1 = reg1 >> 1
+            alt: >>=
+        lshift= <reg>                       : reg1 = reg1 << 1
+            alt: <<=
         inc <reg>                           : reg = reg + 1
     extra shit:
         mov <reg1> <reg2>                   : reg1 = reg2
         cmp <reg1> <reg2>                   : 0 = reg1 - reg2
-        jmp <label>                         : alias for "goto"
+        check <reg>                         : updtes flags for reg
         -                                   : noop
         noop                                : noop
         def <name>                          : creates a label with the name

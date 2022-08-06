@@ -1,0 +1,58 @@
+ldi i 0
+ldi a 64
+-
+
+def init_loop
+    store a
+    inc i
+    ldi tmp 1
+    sub= a tmp
+    if not zero goto init_loop
+    -
+    -
+    -
+    -
+use x y key comp
+def start
+    ldi x 1
+def outer
+    mov i x
+    -
+    -
+    load key
+    ldi tmp 1
+    sub y x tmp
+def inner
+    if not cout goto inner_done
+    mov i y
+    -
+    -
+    load comp
+    cmp comp key
+    if not greater goto inner_done
+    -
+    -
+    -
+    -
+    inc y
+    mov i y
+    -
+    store comp
+    goto inner
+    ldi tmp 2
+    sub= y tmp
+def inner_done
+    inc y
+    mov i y
+    -
+    store key
+    inc x
+    ldi tmp 64
+    cmp x tmp
+    if not zero goto outer
+    -
+    -
+    -
+    -
+def done
+    halt
