@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::fs;
 
+use redstone_schem::world::{World, BlockPos};
+
 pub fn assmeble_brumm(filename: &str) -> Vec<[u8; 4]> {
     let filepath = format!("brumm_src/{}.brumm", filename);
     let contents = fs::read_to_string(filepath).expect("Something went wrong reading the file");
@@ -139,7 +141,8 @@ pub fn assmeble_brumm(filename: &str) -> Vec<[u8; 4]> {
     println!("{:?}", labels);
     bytecode
 }
-pub fn bytes_to_barrelcode(bytecode: &mut Vec<[u8; 4]>) -> (Vec<[u8; 8]>, Vec<[u8; 8]>) {
+pub fn bytes_to_barrelcode(bytecode: &Vec<[u8; 4]>) -> (Vec<[u8; 8]>, Vec<[u8; 8]>) {
+    let mut bytecode = bytecode.clone();
     while bytecode.len() < 256 {
         bytecode.push([0, 0, 0, 0]);
     }
@@ -158,6 +161,7 @@ pub fn bytes_to_barrelcode(bytecode: &mut Vec<[u8; 4]>) -> (Vec<[u8; 8]>, Vec<[u
             barrels1.push(barrel_column);
         }
     }
+    //println!("{:?}", barrels1);
     for x in 0..4 {
         for i in 0..16 {
             let mut barrel_column = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -174,4 +178,27 @@ pub fn bytes_to_barrelcode(bytecode: &mut Vec<[u8; 4]>) -> (Vec<[u8; 8]>, Vec<[u
     (barrels1, barrels2)
 }
 
-fn barrelcode_to_schematic(barrels: (Vec<[u8; 8]>, Vec<[u8; 8]>)) {} // no schems =(
+pub fn barrelcode_to_schematic(barrels: (Vec<[u8; 8]>, Vec<[u8; 8]>), filename: &str) {
+    let mut world = World::new(87, 15, 33);
+    let stone = world.add_block("minecraft:stone");
+
+    for x in 0..4 {
+        for z in 0..16 {
+            for y in 0..8 {
+                let b1 = barrels.0[z + 16 * x][y];
+                let b2 = barrels.1[z + 16 * x][y];
+                match b1 {
+                    1..=15 =>   {world.set_barrel(BlockPos::new(4 * x, 2 * y, 2 * z + 2), b1.into());}
+                    _ =>        {world.set_block(BlockPos::new(4 * x, 2 * y, 2 * z + 2), stone);}
+                }
+                match b2 {
+                    1..=15 =>   {world.set_barrel(BlockPos::new(74 + 4 * x, 2 * y, 2 * z + 2), b2.into());}
+                    _ =>        {world.set_block(BlockPos::new(74 + 4 * x, 2 * y, 2 * z + 2), stone);}
+                }
+            }
+        }
+    }
+    let path = format!("C:/__SKIT__/.actual server/schems/{filename}.schem");
+    world.save_schematic(path.as_str(), 0, -15, 0);
+    println!("saved scematic!");
+}

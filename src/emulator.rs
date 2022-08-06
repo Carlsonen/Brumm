@@ -18,9 +18,9 @@ pub struct BrummCpuEmulator {
 }
 
 impl BrummCpuEmulator {
-    pub fn new(code: Vec<[u8; 4]>) -> Self {
+    pub fn new(code: &Vec<[u8; 4]>) -> Self {
         BrummCpuEmulator {
-            code: code,
+            code: code.clone(),
             pc: 0,
             registers: [0; 11],
             ram: [0; 64],
