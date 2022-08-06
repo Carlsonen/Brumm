@@ -15,7 +15,8 @@ pub struct BrummCpuEmulator {
     fl_odd: bool,
     fl_zero: bool,
     is_running: bool,
-    IO_in: [u8; 4],
+    io_in: [u8; 4],
+    io_out: [u8; 4],
 }
 
 impl BrummCpuEmulator {
@@ -35,7 +36,8 @@ impl BrummCpuEmulator {
             fl_odd: false,
             fl_zero: false,
             is_running: false,
-            IO_in: [0; 4],
+            io_in: [0; 4],
+            io_out: [0; 4],
         }
     }
     pub fn set_code(&mut self, code: Vec<[u8; 4]>) {
@@ -165,7 +167,7 @@ impl BrummCpuEmulator {
                 let p_stack = self.pointer[1] as usize;
                 let c: u16 = match p {
                     0..=63 => self.ram[p] as u16,
-                    123..=126 => self.IO_in[(p - 123) as usize] as u16,
+                    123..=126 => self.io_in[(p - 123) as usize] as u16,
                     _ => 0,
                 };
                 let c = c | match p_stack {
@@ -191,7 +193,8 @@ impl BrummCpuEmulator {
                         self.ram[p] = val;
                     }
                     123..=126 => {
-                        println!("<I/O - {}> {}", p, val);
+                        println!("<I/O - {}> {:b}", p, val);
+                        self.io_out[(p - 123) as usize] = val;
                     }
                     _ => {}
                 }
@@ -264,15 +267,24 @@ impl BrummCpuEmulator {
         self.ram.clone()
     }
     pub fn run_until_dont(&mut self) {
+        let mut cycles = 0;
         self.is_running = true;
         while self.is_running {
             self.tick();
+            cycles += 1;
         }
+        println!("total cycles: {cycles}");
     }
     pub fn set_input(&mut self, port: u8, value: u8) {
         match port {
-            123..=126 => self.IO_in[(port - 123) as usize] = value,
+            123..=126 => self.io_in[(port - 123) as usize] = value,
             _ => {}
+        }
+    }
+    pub fn get_output(&self, port: u8) -> u8 {
+        match port {
+            123..=126 => self.io_out[(port - 123) as usize],
+            _ => 0,
         }
     }
 }
