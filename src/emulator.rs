@@ -40,8 +40,8 @@ impl BrummCpuEmulator {
             io_out: [0; 4],
         }
     }
-    pub fn set_code(&mut self, code: Vec<[u8; 4]>) {
-        self.code = code;
+    pub fn set_code(&mut self, code: &Vec<[u8; 4]>) {
+        self.code = code.clone();
     }
     pub fn tick(&mut self) {
         // (1) - Update Pipeline
@@ -193,7 +193,7 @@ impl BrummCpuEmulator {
                         self.ram[p] = val;
                     }
                     123..=126 => {
-                        println!("<I/O - {}> {:b}", p, val);
+                        println!("<I/O - {}> {}\t\t{:b}", p, val, val);
                         self.io_out[(p - 123) as usize] = val;
                     }
                     _ => {}

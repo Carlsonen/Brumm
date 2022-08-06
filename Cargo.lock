@@ -93,7 +93,7 @@ dependencies = [
 [[package]]
 name = "redstone_schem"
 version = "0.1.0"
-source = "git+https://github.com/StackDoubleFlow/redstone_schem#fd6edbba5772786cd990697b205da2bddedcad13"
+source = "git+https://github.com/StackDoubleFlow/redstone_schem#74e7bf992c1eb09e0869c2048f80a046aedd0759"
 dependencies = [
  "hematite-nbt",
  "serde",

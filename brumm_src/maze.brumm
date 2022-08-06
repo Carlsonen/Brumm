@@ -1,0 +1,292 @@
+ldi h 255
+ldi g 133
+ldi f 145
+ldi e 165
+ldi d 137
+ldi c 163
+ldi b 137
+ldi a 255
+ldi i 0
+ldi i 1
+store a
+store b
+ldi i 2
+ldi i 3
+store c
+store d
+ldi i 4
+ldi i 5
+store e
+store f
+ldi i 6
+ldi i 7
+store g
+store h
+
+
+
+ldi h 128
+ldi g 64
+ldi f 32
+ldi e 16
+ldi d 8
+ldi c 4
+ldi b 2
+ldi a 1
+
+ldi i 8
+ldi i 9
+store a
+store b
+ldi i 10
+ldi i 11
+store c
+store d
+ldi i 12
+ldi i 13
+store e
+store f
+ldi i 14
+ldi i 15
+store g
+store h
+goto maze_start
+-
+-
+-
+-
+-
+-
+-
+-
+-
+
+use posx posy
+use dirx diry
+use e argx argy walls
+
+def maze_start
+ldi posx 1
+ldi posy 1
+ldi dirx 0
+ldi diry 1
+
+-
+-
+
+def loop
+
+# right
+add argx posx diry
+sub argy posy dirx
+call getwall
+-
+-
+
+# front right
+add argx argx dirx
+add argy argy diry
+call getwall
+-
+-
+
+# mid
+add argx posx dirx
+add argy posy diry
+call getwall
+-
+-
+
+# left
+sub argx posx diry
+add argy posy dirx
+call getwall
+-
+-
+
+# front left
+add argx argx dirx
+add argy argy diry
+call getwall
+-
+-
+
+goto inputs
+-
+-
+
+
+
+
+
+# wall shit 14 instructions
+def getwall
+add i argx 0
+ldi tmp 8
+add i argy tmp
+load e
+ldi i 126
+load tmp
+and e tmp e
+if zero goto skip
+-
+-
+add walls walls walls
+return
+addci walls walls 0
+def skip
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+def inputs
+-
+-
+store walls
+halt
+-
+-
+load e
+if odd goto rotleft
+-
+-
+-
+rshift e e 0
+if odd goto rotright
+-
+-
+-
+rshift e e 0
+if odd goto move
+-
+-
+-
+rshift e e 0
+if odd goto toggle_wall
+-
+-
+-
+-
+goto loop
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+# moving
+def move
+ldi tmp 4
+and 0 walls tmp
+if not zero goto loop
+-
+-
+-
+-
+goto loop
+add posx posx dirx
+add posy posy diry
+
+# rotate right
+def rotright
+add e dirx 0
+goto loop
+add dirx diry 0
+sub diry 0 e
+
+# rotate left
+def rotleft
+add e dirx 0
+goto loop
+sub dirx 0 diry
+add diry e 0
+
+# toggle wall
+def toggle_wall
+add argx posx dirx
+if zero goto loop
+-
+-
+ldi tmp 7
+sub 0 argx tmp
+if zero goto loop
+-
+-
+-
+add argy posy diry
+if zero goto loop
+-
+-
+ldi tmp 7
+sub 0 argy tmp
+if zero goto loop
+-
+-
+-
+-
+ldi tmp 8
+add i argy tmp
+-
+add i argx 0
+load e
+-
+load tmp
+xor e e tmp
+goto loop
+ldi i 126
+store e
+
+
+
+

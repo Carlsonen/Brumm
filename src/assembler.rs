@@ -3,7 +3,6 @@ use std::fs;
 
 use redstone_schem::world::{World, BlockPos};
 
-
 pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
     let filepath = format!("brumm_src/{}.brumm", filename);
     let contents = fs::read_to_string(filepath).expect("Something went wrong reading the file");
@@ -146,6 +145,7 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
     }
     bytecode
 }
+
 pub fn bytes_to_barrelcode(bytecode: &Vec<[u8; 4]>) -> (Vec<[u8; 8]>, Vec<[u8; 8]>) {
     let mut bytecode = bytecode.clone();
     while bytecode.len() < 256 {
@@ -166,7 +166,6 @@ pub fn bytes_to_barrelcode(bytecode: &Vec<[u8; 4]>) -> (Vec<[u8; 8]>, Vec<[u8; 8
             barrels1.push(barrel_column);
         }
     }
-    //println!("{:?}", barrels1);
     for x in 0..4 {
         for i in 0..16 {
             let mut barrel_column = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -183,7 +182,8 @@ pub fn bytes_to_barrelcode(bytecode: &Vec<[u8; 4]>) -> (Vec<[u8; 8]>, Vec<[u8; 8
     (barrels1, barrels2)
 }
 
-pub fn barrelcode_to_schematic(barrels: (Vec<[u8; 8]>, Vec<[u8; 8]>), filename: &str) {
+pub fn barrelcode_to_schematic(barrels: &(Vec<[u8; 8]>, Vec<[u8; 8]>), filename: &str) {
+    let barrels = barrels.clone();
     let mut world = World::new(87, 15, 33);
     let stone = world.add_block("minecraft:stone");
 
