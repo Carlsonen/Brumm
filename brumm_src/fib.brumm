@@ -1,6 +1,6 @@
 ldi i 123
 
-ldi a 0
+ldi a 1
 ldi b 0
 ldi c 1
 
