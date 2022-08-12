@@ -1,3 +1,7 @@
+use core::num;
+
+type PortListener = fn(&mut BrummCpuEmulator, called_from: u8);
+fn dummy_port_listener(b: &mut BrummCpuEmulator, called_from: u8) {}
 pub struct BrummCpuEmulator {
     code: Vec<[u8; 4]>,
 
@@ -17,6 +21,8 @@ pub struct BrummCpuEmulator {
     is_running: bool,
     io_in: [u8; 4],
     io_out: [u8; 4],
+
+    port_listeners: [PortListener; 4],
 }
 
 impl BrummCpuEmulator {
@@ -38,6 +44,7 @@ impl BrummCpuEmulator {
             is_running: false,
             io_in: [0; 4],
             io_out: [0; 4],
+            port_listeners: [dummy_port_listener; 4],
         }
     }
     pub fn set_code(&mut self, code: &Vec<[u8; 4]>) {
@@ -193,8 +200,9 @@ impl BrummCpuEmulator {
                         self.ram[p] = val;
                     }
                     123..=126 => {
-                        println!("<I/O - {}> {}\t\t{:b}", p, val, val);
-                        self.io_out[(p - 123) as usize] = val;
+                        let port_index = (p - 123) as usize;
+                        self.io_out[port_index] = val;
+                        self.port_listeners[port_index](self, p as u8);
                     }
                     _ => {}
                 }
@@ -267,13 +275,24 @@ impl BrummCpuEmulator {
         self.ram.clone()
     }
     pub fn run_until_dont(&mut self) {
+        use std::time::Instant;
+        let now = Instant::now();
         let mut cycles = 0;
         self.is_running = true;
         while self.is_running {
             self.tick();
             cycles += 1;
         }
-        println!("total cycles: {cycles}");
+        let elapsed = now.elapsed().as_nanos();
+        let hz = (cycles * 1000) / elapsed;
+        match elapsed {
+            x if x > 10000 => {
+                println!("{cycles} cycles in {} µs ({hz} MHz)", elapsed / 1000);
+            }
+            _ => {
+                println!("{cycles} cycles in {} ns ({hz} MHz)", elapsed);
+            }
+        }
     }
     pub fn set_input(&mut self, port: u8, value: u8) {
         match port {
@@ -285,6 +304,26 @@ impl BrummCpuEmulator {
         match port {
             123..=126 => self.io_out[(port - 123) as usize],
             _ => 0,
+        }
+    }
+    pub fn set_port_listener(&mut self, port: u8, func: PortListener) {
+        match port {
+            123..=126 => self.port_listeners[(port - 123) as usize] = func,
+            _ => {}
+        }
+    }
+    pub fn print_ram(&self) {
+        for y in 0..8 {
+            for x in 0..8 {
+                let val = self.ram[8 * y + x];
+                let num_str = format!("{val}");
+                let n = num_str.len();
+                for _ in 0..5 - n {
+                    print!(" ");
+                }
+                print!("{val}");
+            }
+            print!("\n");
         }
     }
 }

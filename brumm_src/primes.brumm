@@ -3,17 +3,17 @@ def start
     ldi i 0
     ldi a 2
     inc a
-    store a
-
+    store a # commenting
+# this is a comment
 def loop
     inc i
     cmp i g
     if not zero goto loop
-    store a
-    inc a
-    inc a
-    -
-
+        store a
+        inc a
+        inc a
+        -
+    
 ldi a 2
 ldi i 123
 ldi i 1
@@ -22,11 +22,11 @@ store a
 def main_loop
     load a
     if zero goto main_loop
-    mov g i
-    inc i
-    -
-    -
-def not 0
+        mov g i
+        inc i
+        -
+        -
+def not_0
     ldi i 123
     mov i g
     store a
@@ -36,22 +36,22 @@ def set_0
     ldi tmp 63
     cmp i tmp
     if greater goto next_num
-    -
-    -
-    -
-    -
+        -
+        -
+        -
+        -
     goto set_0
-    store 0
-    -
+        store 0
+        -
 def next_num
     mov i g
     inc i
     ldi tmp 63
     cmp i tmp
     if not greater goto main_loop
-    -
-    -
-    -
-    -
+        -
+        -
+        -
+        -
 def end
     halt

@@ -1,17 +1,17 @@
 Every line should be a keyword followed by arguments accepted by the keyword.
-There are 9 registers (a-i), passing '0' as a register argument will act as 0-register.
+There are 9 general purpose registers, 8 which you must name, and a 9th which is always called "i". 
+Passing '0' as a register argument will act as 0-register.
 Register 9 (i) is the pointer for memory, which is the only way to access memory.
 Its all 8 bits, numbers, program counter etc..
 
 Comments are defined with "#" followed by a space, becuase "#" is its own keyword:
     # this is a comment
     #dont do this
-You can rename registers using "use" keyword:
-    use pos_x                   (maps "pos_x" to first available (a))
-    use pos_y                   (maps "pos_y" to first available (b))
+You name registers using "use" keyword:
+    use pos_x
+    use pos_y
     use counter another_var     (you can put multiple in one line)
-
-    > you may only rename the first 8 registers (a-h), i can not be rename to make it clear its the pointer
+    > you may only rename the first 8 registers, i can not be rename to make it clear its the pointer
 
 the instruction set:
     add     <reg1> <reg2> <reg3>            : reg1 = reg2 + reg3

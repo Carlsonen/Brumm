@@ -1,26 +1,8 @@
+# test program
+use x y
+
 ldi i 123
-ldi b 255
-ldi c 1
-
-
-def main_loop
-    load a
-def loop
-    if not odd goto even
-    sub 0 a c
-    if zero goto stop
-    inc b
-    store a
-    -
-    -
-    goto loop
-    add tmp a a
-    addci= a tmp
-def even
-    goto loop
-    -
-    rshift= a a
-def stop
-    -
-    store b
-    halt
+ldi x 15
+-
+store x
+halt

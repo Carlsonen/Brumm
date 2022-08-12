@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fs;
 
-use redstone_schem::world::{World, BlockPos};
+use redstone_schem::world::{BlockPos, World};
 
 pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
     let filepath = format!("brumm_src/{}.brumm", filename);
@@ -9,20 +9,8 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
     let lines: Vec<&str> = contents.lines().collect();
 
     let mut bytecode: Vec<[u8; 4]> = vec![];
-    let mut regs: HashMap<&str, u8> = HashMap::from([
-        ("0", 0),
-        ("a", 1),
-        ("b", 2),
-        ("c", 3),
-        ("d", 4),
-        ("e", 5),
-        ("f", 6),
-        ("g", 7),
-        ("h", 8),
-        ("i", 9),
-        ("tmp", 10),
-        ("tmp2", 11),
-    ]);
+    let mut regs: HashMap<&str, u8> =
+        HashMap::from([("0", 0), ("i", 9), ("tmp", 10), ("tmp2", 11)]);
     let flags: HashMap<&str, u8> = HashMap::from([
         ("odd", 0),
         ("true", 5),
@@ -38,7 +26,7 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
         let mut reg_n = 1;
         for line in &lines {
             let tokens: Vec<&str> = line.split_whitespace().collect();
-            if *line == "" || tokens[0] == "#" {
+            if *line == "" || tokens.len() == 0 || tokens[0] == "#" {
                 continue;
             }
 
@@ -193,12 +181,20 @@ pub fn barrelcode_to_schematic(barrels: &(Vec<[u8; 8]>, Vec<[u8; 8]>), filename:
                 let b1 = barrels.0[z + 16 * x][y];
                 let b2 = barrels.1[z + 16 * x][y];
                 match b1 {
-                    1..=15 =>   {world.set_barrel(BlockPos::new(4 * x, 2 * y, 2 * z + 2), b1.into());}
-                    _ =>        {world.set_block(BlockPos::new(4 * x, 2 * y, 2 * z + 2), stone);}
+                    1..=15 => {
+                        world.set_barrel(BlockPos::new(4 * x, 2 * y, 2 * z + 2), b1.into());
+                    }
+                    _ => {
+                        world.set_block(BlockPos::new(4 * x, 2 * y, 2 * z + 2), stone);
+                    }
                 }
                 match b2 {
-                    1..=15 =>   {world.set_barrel(BlockPos::new(74 + 4 * x, 2 * y, 2 * z + 2), b2.into());}
-                    _ =>        {world.set_block(BlockPos::new(74 + 4 * x, 2 * y, 2 * z + 2), stone);}
+                    1..=15 => {
+                        world.set_barrel(BlockPos::new(74 + 4 * x, 2 * y, 2 * z + 2), b2.into());
+                    }
+                    _ => {
+                        world.set_block(BlockPos::new(74 + 4 * x, 2 * y, 2 * z + 2), stone);
+                    }
                 }
             }
         }

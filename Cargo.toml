@@ -6,3 +6,4 @@ edition = "2021"
 
 [dependencies]
 redstone_schem = { git = "https://github.com/StackDoubleFlow/redstone_schem" }
+image = "0.24.3"
