@@ -1,0 +1,219 @@
+# -2 = 224
+#  2 = 32
+# y = -2
+# y = -2
+    call set
+        ldi i 1
+        ldi a 224
+    call set
+        ldi i 10
+        ldi a 224
+    call set
+        ldi i 11
+        ldi a 31
+    call set
+        ldi i 7
+        ldi a 20    # iteration count
+
+
+def y_loop
+# x = -2
+    call set
+        ldi i 0
+        ldi a 224
+def x_loop
+    call mandel
+    -
+    -
+    call comp
+        ldi i 0
+        ldi i 11
+    if not zero goto x_loop
+    inc a
+    ldi i 0
+    -
+    store a
+# end_x
+    call comp
+        ldi i 1
+        ldi i 11
+    if not zero goto y_loop
+    inc a
+    ldi i 1
+    -
+    store a
+
+
+halt
+
+# ======== mandel ==========
+def mandel
+    call set
+        ldi i 2
+        ldi a 0
+    call set
+        ldi i 3
+        ldi a 0
+    call set
+        ldi i 6
+        ldi a 0
+# loop
+def mandel_loop
+# zx2 = zx * zx
+    call load
+        ldi i 2
+        -
+    call mult
+        -
+        -
+    call set
+        ldi i 4
+        mov a c
+# zy2 = zy * zy
+    call load
+        ldi i 3
+        -
+    call mult
+        -
+        -
+    call set
+        ldi i 4
+        mov a c
+    
+# zy = 2 * zx * zy
+    call load
+        ldi i 2
+        ldi i 3
+    call mult
+        -
+        -
+    add d c c
+
+# zx = zx2 - zy2
+    call load
+        ldi i 4
+        ldi i 5
+    sub c a b
+    call load
+        ldi i 0
+        ldi i 1
+    call set
+        ldi i 2
+        add a c a
+    call set
+        ldi i 3
+        add a d b
+    
+# inc counter
+    call inc
+        ldi i 6
+        -
+    call comp
+        ldi i 6
+        ldi i 7
+    if greater goto plot
+    -
+    -
+    -
+    -
+    
+# escape
+    call load
+        ldi i 4
+        ldi i 5
+    sub= a b
+    ldi tmp 64
+    cmp tmp a
+    if greater goto mandel_loop
+    -
+    -
+    -
+    -
+    return
+    -
+    -
+# ======== mandel ==========
+# ========= plot ===========
+def plot
+    call load
+        ldi i 0
+        ldi i 1
+    ldi c 32
+    add= a c
+    add= b c
+    ldi i 126
+    ldi i 125
+    store a
+    store b
+    ldi i 124
+    ldi a 1
+    return          # return from mandel call
+    store a
+    -
+# ========= plot ===========
+# ========= inc ============
+def inc
+    -
+    load a
+    return
+    inc a
+    store a
+# ========= inc ============
+# ========= set ============
+def set
+    return
+    -
+    store a
+# ========= set ============
+# ========= load ===========
+def load
+    return
+    load a
+    load b
+# ========= load ===========
+# ========= comp ===========
+def comp
+    -
+    load a
+    return
+    load b
+    cmp a b
+# ========= comp ===========
+# ========= mult ===========
+# c = a * b (4.4 fp)
+# uses a - e
+def mult
+    ldi e 0
+def loop
+    check b
+    if zero goto done
+    -
+    -
+    -
+    check b
+    if not odd goto skip
+    -
+    -
+    -
+    -
+    add= c a
+    addco= d e
+def skip
+    >>= b
+    <<= e
+    goto loop
+    <<= a
+    addco= e 0
+def done
+    <<= d
+    <<= d
+    <<= d
+    <<= d
+    >>= c
+    >>= c
+    >>= c
+    >>= c
+    return
+    add= c d
+    -
+# ========= mult ===========

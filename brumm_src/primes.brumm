@@ -1,10 +1,12 @@
-def start
-    ldi g 63
-    ldi i 0
-    ldi a 2
-    inc a
-    store a # commenting
-# this is a comment
+use a b c d e f g h
+const printer 123
+
+ldi g 63
+ldi i 0
+ldi a 2
+inc a
+store a
+
 def loop
     inc i
     cmp i g
@@ -15,10 +17,11 @@ def loop
         -
     
 ldi a 2
-ldi i 123
+point printer
 ldi i 1
 store a
 -
+
 def main_loop
     load a
     if zero goto main_loop

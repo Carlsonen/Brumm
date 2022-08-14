@@ -1,0 +1,43 @@
+use a param ret n
+const printer 123
+ldi n 0
+
+def loop
+    call fib
+        mov param n
+        point stack
+    inc n
+    ldi tmp 30
+    cmp n tmp
+    if not zero goto loop
+        point printer
+        ldi ret 0
+        store ret
+        -
+halt
+
+def fib
+    ldi tmp 2
+    cmp param tmp
+    if not greater goto done
+        -
+        -
+        -
+        ldi tmp 1
+    sub a param tmp
+    call fib
+        mov param a
+        store a
+    load a
+    ldi tmp 1
+    sub= a tmp
+    call fib
+        mov param a
+        -
+    return
+        -
+        -
+    def done
+        return
+            inc ret
+            -

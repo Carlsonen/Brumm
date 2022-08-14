@@ -1,3 +1,5 @@
+use a x y key comp
+
 ldi i 0
 ldi a 64
 -
@@ -8,11 +10,10 @@ def init_loop
     ldi tmp 1
     sub= a tmp
     if not zero goto init_loop
-    -
-    -
-    -
-    -
-use x y key comp
+        -
+        -
+        -
+        -
 def start
     ldi x 1
 def outer
@@ -24,10 +25,10 @@ def outer
     sub y x tmp
 def inner
     if not cout goto inner_done
-    mov i y
-    -
-    -
-    load comp
+        mov i y
+        -
+        -
+        load comp
     cmp comp key
     if not greater goto inner_done
     -
@@ -39,8 +40,8 @@ def inner
     -
     store comp
     goto inner
-    ldi tmp 2
-    sub= y tmp
+        ldi tmp 2
+        sub= y tmp
 def inner_done
     inc y
     mov i y
@@ -50,9 +51,9 @@ def inner_done
     ldi tmp 64
     cmp x tmp
     if not zero goto outer
-    -
-    -
-    -
-    -
+        -
+        -
+        -
+        -
 def done
     halt

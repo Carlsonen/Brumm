@@ -286,6 +286,9 @@ impl BrummCpuEmulator {
         let elapsed = now.elapsed().as_nanos();
         let hz = (cycles * 1000) / elapsed;
         match elapsed {
+            x if x > 10000000 => {
+                println!("{cycles} cycles in {} ms ({hz} MHz)", elapsed / 1000000);
+            }
             x if x > 10000 => {
                 println!("{cycles} cycles in {} µs ({hz} MHz)", elapsed / 1000);
             }

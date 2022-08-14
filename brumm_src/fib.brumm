@@ -1,4 +1,4 @@
-ldi i 123
+ldi i 123 # printer
 
 ldi a 0
 ldi b 0

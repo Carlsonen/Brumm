@@ -20,6 +20,7 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
         ("greater", 3),
     ]);
     let mut labels: HashMap<&str, u8> = HashMap::from([]);
+    let mut constants: HashMap<&str, u8> = HashMap::from([("stack", 127)]);
     {
         // get labels
         let mut n = 0;
@@ -44,6 +45,10 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
                         }
                     }
                 }
+                "const" => {
+                    let val: u8 = tokens[2].parse().unwrap();
+                    constants.insert(tokens[1], val);
+                }
                 _ => n += 1,
             }
         }
@@ -58,7 +63,7 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
 
         if match opcode {
             // ignore other shit
-            "use" | "def" | "#" => true,
+            "use" | "def" | "#" | "const" => true,
             _ => false,
         } {
             continue;
@@ -117,6 +122,18 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
             }
             "inc" => [2, regs[tokens[1]], 0, regs[tokens[1]]],
             "check" => [0, 0, 0, regs[tokens[1]]],
+            "point" => {
+                let num: u8 = constants[tokens[1]];
+                [9, 9, num & 0xf, (num >> 4) & 0xf]
+            }
+            "ldc" => {
+                let num: u8 =
+                    "0123456789abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ \n"
+                        .chars()
+                        .position(|x| x == tokens[2].chars().nth(0).unwrap())
+                        .unwrap() as u8;
+                [9, regs[tokens[1]], num & 0xf, (num >> 4) & 0xf]
+            }
             _ => {
                 println!("wtf is this:\n{:?}\n", tokens);
                 continue;

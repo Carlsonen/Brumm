@@ -1,8 +1,15 @@
-# test program
-use x y
+use a b c d e
+const char_display 125
+point char_display
 
-ldi i 123
-ldi x 15
--
-store x
+ldc a l
+ldc b m
+ldc c a
+ldc d o
+ldi e 69
+store a
+store b
+store c
+store d
+store e
 halt
