@@ -35,6 +35,13 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
                 "def" => {
                     labels.insert(tokens[1], n);
                 }
+                "page" => {
+                    let val: u8 = tokens[1].parse().unwrap();
+                    if n > val * 64 {
+                        panic!("page overflow!!!!");
+                    }
+                    n = val * 64;
+                }
                 "use" => {
                     for i in 1..tokens.len() {
                         if i <= 8 {
@@ -64,6 +71,14 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
         if match opcode {
             // ignore other shit
             "use" | "def" | "#" | "const" => true,
+            "page" => {
+                let page: u8 = tokens[1].parse().unwrap();
+                let line = page * 64;
+                while (bytecode.len() as u8) < line {
+                    bytecode.push([0, 0, 0, 0]); // insert noop
+                }
+                true
+            }
             _ => false,
         } {
             continue;
@@ -142,9 +157,11 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
         };
         bytecode.push(bytes);
     }
+    let mut line = 0;
     if debug_mode {
         for bytes in &bytecode {
-            println!("{:?}", bytes);
+            println!("{line}\t{:?}", bytes);
+            line += 1;
         }
         println!("{:?}", regs);
         println!("{:?}", labels);
