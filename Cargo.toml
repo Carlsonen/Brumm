@@ -6,4 +6,5 @@ edition = "2021"
 
 [dependencies]
 redstone_schem = { git = "https://github.com/StackDoubleFlow/redstone_schem" }
-rand = "0.5.0"
+rand = "0.8.5"
+limage = {git = "https://github.com/Carlsonen/limage"}

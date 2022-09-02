@@ -1,4 +1,4 @@
-use core::num;
+use limage::*;
 
 type PortListener = fn(&mut BrummCpuEmulator, called_from: u8);
 fn dummy_port_listener(b: &mut BrummCpuEmulator, called_from: u8) {}
@@ -23,6 +23,8 @@ pub struct BrummCpuEmulator {
     io_out: [u8; 4],
 
     port_listeners: [PortListener; 4],
+
+    display: Limage
 }
 
 impl BrummCpuEmulator {
@@ -45,6 +47,7 @@ impl BrummCpuEmulator {
             io_in: [0; 4],
             io_out: [0; 4],
             port_listeners: [dummy_port_listener; 4],
+            display: Limage::new(64,64)
         }
     }
     pub fn set_code(&mut self, code: &Vec<[u8; 4]>) {
@@ -328,5 +331,34 @@ impl BrummCpuEmulator {
             }
             print!("\n");
         }
+    }
+}
+
+
+// display shits
+impl BrummCpuEmulator {
+    pub fn display_put_pixel(&mut self, x: u32, y: u32) {
+        self.display.put_hsl(x % 64, y % 64, [30.0, 0.9, 0.5]);
+    }
+    pub fn display_erase_pixel(&mut self, x: u32, y: u32) {
+        self.display.put_rgb(x % 64, y % 64, [0, 0, 0]);
+    }
+    pub fn display_flood(&mut self) {
+        for x in 0..64 {
+            for y in 0..64 {
+                self.display.put_hsl(x % 64, y % 64, [30.0, 0.9, 0.5]);
+            }
+        }
+    }
+    pub fn display_clear(&mut self) {
+        for x in 0..64 {
+            for y in 0..64 {
+                self.display.put_rgb(x % 64, y % 64, [0, 0, 0]);
+            }
+        }
+    }
+    // just saving the png
+    pub fn display_update(&mut self) {
+        self.display.save("display.png").unwrap();
     }
 }
