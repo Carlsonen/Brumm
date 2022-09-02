@@ -64,7 +64,7 @@ def store
         -
 
 
-
+page 1
 def maze_start
 ldi posx 1
 ldi posy 1
@@ -121,28 +121,9 @@ def getwall
     def skip
         -
         -
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
+
+
+page 2
 def inputs
     -
     -
@@ -174,41 +155,8 @@ def inputs
     goto loop
         -
         -
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
+
+page 3
 # moving
 def move
     ldi tmp 4
