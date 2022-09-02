@@ -10,9 +10,7 @@ fn main() {
     let code = assmeble_brumm(program_name, false);
     let mut emulator = BrummCpuEmulator::new();
     emulator.set_code(&code);
-    emulator.set_port_listener(123, port_printer);
-    emulator.set_port_listener(124, port_rng);
-    emulator.set_port_listener(125, port_char_display);
+    emulator.set_port_listener(124, port_lamp_display);
     emulator.run_until_dont();
 }
 
@@ -33,4 +31,26 @@ fn port_char_display(emulator: &mut BrummCpuEmulator, called_from: u8) {
     let val = emulator.get_output(called_from);
     let c = chars.chars().nth(val as usize).unwrap();
     print!("{c}");
+}
+
+fn port_lamp_display(emulator: &mut BrummCpuEmulator, called_from: u8) {
+    let x = emulator.get_output(126);
+    let y = emulator.get_output(125);
+    let command = emulator.get_output(124);
+    match command {
+        0 => {
+            emulator.display_put_pixel(x as u32, y as u32);
+        }
+        1 => {
+            emulator.display_erase_pixel(x as u32, y as u32);
+        }
+        2 => {
+            emulator.display_flood();
+        }
+        3 => {
+            emulator.display_clear();
+        }
+        _ => {}
+    }
+    emulator.display_update();
 }

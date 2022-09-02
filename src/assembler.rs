@@ -81,7 +81,8 @@ pub fn assmeble_brumm(filename: &str, debug_mode: bool) -> Vec<[u8; 4]> {
             "xnor" => [7, regs[tokens[1]], regs[tokens[2]], regs[tokens[3]]],
             "rshift" => [8, regs[tokens[1]], regs[tokens[2]], regs[tokens[3]]],
             "ldi" => {
-                let num: u8 = tokens[2].parse().unwrap();
+                let tmp: i16 = tokens[2].parse().unwrap();
+                let num: u8 = (tmp % 256) as u8;
                 [9, regs[tokens[1]], num & 0xf, (num >> 4) & 0xf]
             }
             "load" => [10, regs[tokens[1]], 0, 0],

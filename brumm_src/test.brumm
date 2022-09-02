@@ -1,15 +1,30 @@
-use a b c d e
-const char_display 125
-point char_display
+use x y n i
+const disp_x 126
+const disp_y 125
+const disp_cmd 124
 
-ldc a l
-ldc b m
-ldc c a
-ldc d o
-ldi e 69
-store a
-store b
-store c
-store d
-store e
+ldi n 0
+ldi i -64
+
+def loop
+    call plot
+        mov x n
+        mov y n
+    inc i
+    if not zero goto loop
+        inc n
+        -
+        -
+        -
+
 halt
+
+def plot
+    point disp_x
+    point disp_y
+    store x
+    store y
+    point disp_cmd
+    return
+        store 0
+        -
